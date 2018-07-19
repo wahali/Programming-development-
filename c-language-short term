@@ -1,0 +1,908 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include<string.h>
+void star();            //两排星，装饰
+int stu_interface();   //学生界面
+void tea_interface();  //教师界面
+void total_interface();        //主界面
+void tea_function();    // 教师功能菜单
+void exit_system();    // 系统推出提示
+struct student* read_file();   //学生账号录入
+void write_file(struct student* head);  //学生信息存入文件
+struct student* read_file1();                 //开启系统，将文件中所有的信息存入内存
+struct student*  find(struct student *head);    //学生查找，返回所查找学生的结构体指针
+void attendance(char* _sc_number);         //学生出勤
+void attendance_evaluation();      //出勤评测
+void print(struct student *head);             //查看全部的考勤记录
+void print_lesson(struct student *head);          //查看某课程的考勤记录
+void  print_class1(struct student *head);        //查看某班级的考勤信息
+void print_sc_number(struct student *head);            //查询某学生的考勤信息
+void print_tea_name(struct student *head);            //显示某老师全部课程信息
+void print_tea_lesson(struct student *head);           //显示某老师某课程的出勤信息
+struct student* insert_Node(struct student *head);      //对链表的插入操作,此处形参的head为已有链表的head指针
+struct student* Del_Node(struct student *head);            //删除指定num的结点
+struct student*  find(struct student *head);         //查找已知学号的学生，返回其指针
+void modify(struct student* p);          //老师修改，增补学生的信息
+void return_tea();            //返回教师菜单
+void return_main();           //返回主菜单
+//#define address E:\\c实验\\c短学期\\学生.txt  //存放学生信息的文件
+struct student* f_head;          //定义链表的总头
+//struct time {                               //学生基本的信息结构
+//		int year,month,day;
+//		int hour,minute,second;
+//	};
+//struct course {
+//		char course_name[20];
+//		int attendance;
+
+//	};
+struct student {
+		char name[10];
+		char gender[10];
+		char sc_number[20];
+		char class1[20];
+		char lesson_name[20];
+		char password[20];
+		char tea_name[20];
+		//char phone_number[15];
+        int qingjia_num;
+        int kuangke_num;
+        int zaotui_num;
+        int chidao_num;
+        int lesson_time;
+        int attendance;
+		struct student *next;
+	};
+struct teacher{
+    char id[20],password[20];
+}tea[5];
+
+void star() {
+	printf("*********************************************\n");
+	printf("*********************************************\n");//图形界面设计，用以分隔
+}
+
+/*void information_display() {                    //学生信息显示
+	char szTest[1000] = { 0 };
+
+	FILE *fp = fopen("D:\\学生.txt", "r");
+	if (NULL == fp)
+	{
+		printf("failed to open dos.txt\n");
+	}
+
+	while (!feof(fp))
+	{
+		memset(szTest, 0, sizeof(szTest));   //将结构体中变量全置于0
+		fgets(szTest, sizeof(szTest) - 1, fp); // 包含了\n
+		printf("%s", szTest);
+	}
+
+	fclose(fp);
+
+	printf("\n");
+}*/
+
+void total_interface(){
+    star();
+    printf("欢迎使用学生考勤系统！\n");
+    printf("你是学生还是老师?\n");
+    printf("(1)学生\t(2)老师\n(3)退出\n");
+    star();
+    int choice = 0;
+    scanf("%d",&choice);
+    while(choice!=1&&choice!=2&&choice!=3){
+        printf("输入错误，请重新输入\n");
+        scanf("%d",&choice);
+    }
+    system("cls");
+    if(choice==1){stu_interface();}
+    else if(choice == 2){tea_interface();}
+    else exit_system(f_head);
+}
+
+int stu_interface(){                      //学生界面
+    struct student* q;
+    //char _lesson_name[20];
+    q = read_file();
+    int flag = 0,time = 0;            // 记录状态
+    star();
+    printf("欢迎进入学生界面！！\n");
+	char _sc_number[20],_password[20];
+    struct student* p;
+    p = q;
+	do{
+	printf("请输入你的学号以确定身份\n");
+	star();
+	scanf("%s",_sc_number);
+	time++;
+    while(p!=NULL){
+        if(strcmp(p -> sc_number,_sc_number) == 0){flag = 1;break;}
+        else{
+            p = p -> next;
+        }
+    }
+    if(flag == 0)
+    {   system("cls");
+        printf("未查找到该学生！请重新输入！");
+    printf("输入第%d次\n",time+1);}
+    if(time == 5 && flag!=1){
+	    printf("五次学号输入错误，自动退出系统！\n");
+	    exit_system();return 0;}
+	}while(flag!=1);
+	time = 0;
+	p = q;
+        do{
+    printf("请输入你的密码\n");
+    star();
+	scanf("%s",_password);
+	time++;
+    while(p!=NULL){
+        if(strcmp(p -> password,_password) == 0){flag = 3;break;}
+        else{
+            p = p -> next;
+        }
+    }
+	if(time == 5 && flag!=3){
+	    printf("五次密码输入错误，自动退出系统！\n");
+	    exit_system();}
+	if(flag!=3){
+        system("cls");
+        printf("您输入的密码错误，请重试！\n");
+        printf("输入第%d次\n",time+1);}
+	}while(flag!=3);
+    system("cls");
+    star();
+	printf("增加考勤记录？\n");
+    printf("(1)是\t(2)否\n");
+    flag = 0;
+    scanf("%d",&flag);
+    if(flag == 2){
+}
+	attendance(_sc_number);
+	return_main();
+	exit(0);
+
+	//scanf("%s", );
+	//printf("是否进行签到？\n");
+	//printf("签到成功\n");
+	return 0;
+
+}
+
+void attendance(char* _sc_number){         //学生出勤
+    char _lesson_name[20];
+    star();
+    printf("请输入相应的课程名称:\n");
+    scanf("%s",_lesson_name);
+    struct student* p;
+    int i = 1;
+    //p = q;
+    p = f_head;
+    while(p!=NULL){
+        if(strcmp(p -> sc_number,_sc_number) == 0&&strcmp(p -> lesson_name,_lesson_name) == 0){
+                //printf("已找到\n");
+                p->attendance++;
+                printf("签到成功！！");
+                system("pause");
+                return_main();
+                }
+        else{
+            p = p -> next; i++;
+        }
+    }
+   printf("未查找到该条目！");
+    return NULL;
+}
+struct student* read_file(){       //学生账号录入
+    struct student *head = NULL,*q,*rear = NULL;
+        q = (struct student*)malloc(sizeof(struct student));
+        //memset(&p1, 0, sizeof(p1));      //将结构体内变量都置为1
+        head = q;rear = q;
+	FILE * fp;
+	fp = fopen("学生账户.txt", "r");
+	if(fp == NULL) printf("can not open the file");
+	fscanf(fp, "%s%s", q->sc_number,q->password);
+	//printf("读入的信息为:\n学号:%s 姓名:%s 性别:%s 班级:%s 课程名称:%s 请假:%d 旷课:%d早退:%d 迟到:%d 出勤:%d\n",p1->sc_number,p1->name,p1->gender,p1->class1,p1->lesson_name,p1->qingjia_num,p1->kuangke_num,p1->zaotui_num,p1->chidao_num,p1->attendance);
+        while(!feof(fp)){
+       // if(head == NULL)head = p1;
+       //     else rear->next = p1;
+        q = (struct student*)malloc(sizeof(struct student));
+        rear -> next = q;rear = q;
+       // memset(&p1, 0, sizeof(p1));      //将结构体内变量都置为1
+	//fscanf(fp, "%s %s %s %s %s %s", p1->sc_number,p1->name,p1->gender,p1->class1,p1->password,p1->phone_number);
+	fscanf(fp, "%s", q->sc_number);
+	fscanf(fp, "%s",q->password);
+	//printf("读入的信息为:\n学号:%s 姓名:%s 性别:%s 班级:%s 课程名称:%s 请假:%d 旷课:%d 早退:%d 迟到:%d 出勤:%d\n",p1->sc_number,p1->name,p1->gender,p1->class1,p1->lesson_name,p1->qingjia_num,p1->kuangke_num,p1->zaotui_num,p1->chidao_num,p1->attendance);
+        }
+        fclose(fp);
+        rear->next = NULL;
+        return (head);
+}
+void tea_interface() {           //教师界面     (录入教师账户信息)
+    system("cls");
+    star();
+    printf("欢迎进入教师界面\n");
+    char id[20],password[20];
+    int i,flag = 0,time = 0;           //记录状态,输入次数
+    FILE * fp;
+    fp = fopen("老师.txt","r");
+    for(i = 0;i<5;i++){
+        fscanf(fp,"%s%s",tea[i].id,tea[i].password);
+        //printf("%s%s\n",tea[i].id,tea[i].password);     录入教师信息时输出录入的信息
+    }
+    fclose(fp);
+    do{
+	printf("请输入你的证件号码以确定权限\n");
+	star();
+	scanf("%s",id);
+	time++;
+	for(i=0;i<5;i++){
+        if(strcmp(id,tea[i].id)==0){
+                flag = 1;break;    //账号正确
+        }
+	}
+	if(time == 5 && flag!=1){
+	    printf("五次证件号码输入错误，自动退出系统！\n");
+	    exit_system();}
+	if(flag!=1){
+        system("cls");
+        printf("您输入的账号不存在，请重试！\n");
+        printf("输入第%d次\n",time+1);
+    }
+	if(flag ==1)break;
+	}while(flag != 1);
+	time = 0;
+        do{
+    printf("请输入你的密码\n");
+	scanf("%s",password);
+	time++;
+	for(i=0;i<5;i++){
+        if(strcmp(password,tea[i].password)==0){
+                flag = 3;break;   //账号密码正确
+        }
+	}if(time == 5 && flag!=3){
+	    printf("五次密码输入错误，自动退出系统！\n");
+	    exit_system();}
+	if(flag!=3){
+        system("cls");
+        printf("您输入的密码错误，请重试！\n");
+        printf("输入第%d次\n",time+1);
+	}
+	if(flag == 3)break;
+	}while(flag!=3);
+	system("cls");
+	flag = 0;
+	star();
+	printf("已获得权限！！\n");
+	tea_function();
+}
+
+void exit_system(struct student* head){                  //退出学生考勤系统
+    system("cls");
+    printf("系统退出！！\n");
+    write_file(head);
+    exit(0);
+}
+
+/*void save_localtime() {                       //保存当前时间
+	time_t t;
+	struct tm * lt;
+	time(&t);//获取Unix时间戳。
+	lt = localtime(&t);//转为时间结构。
+	printf("%d/%d/%d %d:%d:%d\n", lt->tm_year + 1900, lt->tm_mon, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);//输出结果
+}
+
+void info_entry() {                              //新增学生信息录入文件
+    char name[20] =  "李华" , gender[5] =  "男", class1[20] =  "1712480297" , number[30] =  "电信三班" , password[30] =  "asdfgsdf" , phone[20] = "15679027785";
+    FILE*fp;
+	fp = fopen("D:\\C实验\\C短学期实验\\学生.txt", "a");
+	fprintf(fp, "%s %s %s %s %s %s\n", name, gender, number, class1, password, phone);
+	fclose(fp);
+}*/
+
+void write_file(struct student* head)          ////学生信息存入文件
+{
+   struct student *p=head;
+   FILE *fp =fopen("学生.txt","w");
+   if(fp==NULL)
+   {
+       printf("打开文件失败!");
+       return;
+   }
+   while(p)
+   {
+
+       //输出链表节点数据到屏幕
+      // printf("学号:%s 姓名:%s 性别:%s 班级:%s 课程名称:%s 请假:%d 旷课:%d早退:%d 迟到:%d 出勤:%d\n",p->sc_number,p-> name, p->gender,p-> class1,p->lesson_name,p->qingjia_num,p->kuangke_num,p->zaotui_num,p->chidao_num,p->attendance);
+       //输出链表节点数据到文件output.txt
+       //fprintf(fp, " %s %s %s %s %s %d %d %d %d %d",p->sc_number,p->name,p->gender,p->class1,p->lesson_name,p->qingjia_num,p->kuangke_num,p->zaotui_num,p->chidao_num,p->attendance);
+        fprintf(fp," %s",p->sc_number);
+        fprintf(fp," %s",p-> name);
+        fprintf(fp," %s", p->gender);
+        fprintf(fp," %s",p-> class1);
+        fprintf(fp," %s",p->lesson_name);
+        fprintf(fp," %s",p->tea_name);
+        fprintf(fp," %d",p->qingjia_num);
+        fprintf(fp," %d",p->kuangke_num);
+        fprintf(fp," %d",p->zaotui_num);
+        fprintf(fp," %d",p->chidao_num);
+        fprintf(fp," %d",p->attendance);
+       //fprintf(fp,"\n");
+       p=p->next;
+   }
+   //printf("\n");
+   //fseek(fp,-1,SEEK_CUR) ;fseek(fp,-1,SEEK_CUR);
+   //fprintf(fp,"\n");
+   fclose(fp);
+}
+
+void attendance_evaluation() {                      //出勤评测
+    while(1){
+        struct student* p;
+    p = find(f_head);
+    printf("%s的%s的考勤分数为%d",p->name,p->lesson_name,10*p->attendance);
+    int flag;
+    printf("是否还需要查询其他的考勤分数?\n");
+    printf("(1)是\t(2)否");
+    flag = 0;
+    scanf("%d",&flag);
+    if(flag == 2){
+    return_main();
+    exit_system(f_head);
+    exit(0);
+    }
+    }
+}
+
+/*void read_file2() {          //读取文件获得学生的信息用以修改信息
+	struct student stu1;
+	//memset(&stu1, 0, sizeof(stu1));      //将结构体内变量都置为1
+	FILE*fp;
+	fp = fopen("D:\\C实验\\C短学期实验\\学生.txt", "r");
+	fscanf(fp, "%s%s%s%s%s%s", stu1.sc_number,stu1.name,stu1.gender, stu1.class1, stu1.password, stu1.phone_number);
+	printf("读入的信息为:\n学号:%s 姓名:%s 性别:%s  班级:%s 密码:%s 手机号码:%s",stu1.sc_number,stu1.name, stu1.gender, stu1.class1, stu1.password, stu1.phone_number);
+	fclose(fp);
+}*/
+
+struct student* read_file1(){                 //开启系统，将文件中所有的信息存入内存
+       // char destination[10]={"-999"};            //设置最终停止学号
+        struct student *head = NULL,*p1,*rear = NULL;
+        p1 = (struct student*)malloc(sizeof(struct student));
+        //memset(&p1, 0, sizeof(p1));      //将结构体内变量都置为1
+        head = p1;rear = p1;
+	FILE * fp;
+	fp = fopen("学生.txt", "r");
+	if(fp == NULL) printf("can not open the file");
+	fscanf(fp, "%s",p1->sc_number);
+	fscanf(fp, "%s",p1->name);
+	fscanf(fp, "%s",p1->gender);
+	fscanf(fp, "%s",p1->class1);
+	fscanf(fp, "%s",p1->lesson_name);
+	fscanf(fp, "%s",p1->tea_name);
+	fscanf(fp, "%d",&p1->qingjia_num);
+	fscanf(fp, "%d",&p1->kuangke_num);
+	fscanf(fp, "%d",&p1->zaotui_num);
+	fscanf(fp, "%d",&p1->chidao_num);
+	fscanf(fp, "%d",&p1->attendance);
+	//printf("读入的信息为:\n学号:%s 姓名:%s 性别:%s 班级:%s 课程名称:%s 请假:%d 旷课:%d早退:%d 迟到:%d 出勤:%d\n",p1->sc_number,p1->name,p1->gender,p1->class1,p1->lesson_name,p1->qingjia_num,p1->kuangke_num,p1->zaotui_num,p1->chidao_num,p1->attendance);
+        while(!feof(fp)){
+       // if(head == NULL)head = p1;
+       //     else rear->next = p1;
+        p1 = (struct student*)malloc(sizeof(struct student));
+        rear -> next = p1;rear = p1;
+       // memset(&p1, 0, sizeof(p1));      //将结构体内变量都置为1
+	//fscanf(fp, "%s %s %s %s %s %s", p1->sc_number,p1->name,p1->gender,p1->class1,p1->password,p1->phone_number);
+	fscanf(fp, "%s", p1->sc_number);
+	fscanf(fp, "%s",p1->name);
+	fscanf(fp, "%s",p1->gender);
+	fscanf(fp, "%s",p1->class1);
+	fscanf(fp, "%s",p1->lesson_name);
+	fscanf(fp, "%s",p1->tea_name);
+	fscanf(fp, "%d",&p1->qingjia_num);
+	fscanf(fp, "%d",&p1->kuangke_num);
+	fscanf(fp, "%d",&p1->zaotui_num);
+	fscanf(fp, "%d",&p1->chidao_num);
+	fscanf(fp, "%d",&p1->attendance);
+	//printf("读入的信息为:\n学号:%s 姓名:%s 性别:%s 班级:%s 课程名称:%s 请假:%d 旷课:%d 早退:%d 迟到:%d 出勤:%d\n",p1->sc_number,p1->name,p1->gender,p1->class1,p1->lesson_name,p1->qingjia_num,p1->kuangke_num,p1->zaotui_num,p1->chidao_num,p1->attendance);
+        }
+        fclose(fp);
+        rear->next = NULL;
+        return (head);
+
+}
+
+/*void write_file(struct student *p1){                     //将学生课表信息写入文件
+	FILE*fp;
+	fp = fopen("学生.txt", "w");
+	fprintf(fp, "写入文件的信息为:\n学号:%s 姓名:%s 性别:%s 班级:%s 课程名称:%s 请假:%d 旷课:%d早退:%d 迟到:%d 出勤:%d\n",p1->sc_number,p1->name,p1->gender,p1->class1,p1->lesson_name,p1->qingjia_num,p1->kuangke_num,p1->zaotui_num,p1->chidao_num,p1->attendance);
+	fclose(fp);
+}
+*/
+/*struct student* create(){    //创建新的学生信息
+        //count++;
+        struct student *head = NULL,*p1,*rear = NULL;
+        p1 = (struct student*)malloc(sizeof(struct student));
+        printf("请输入学号\n");scanf("%s",p1->sc_number);
+        printf("请输入姓名\n");scanf("%s",p1->name);
+        printf("请输入性别\n");scanf("%s",p1->gender);
+        printf("请输入班级\n");scanf("%s",p1->class1);
+        printf("请输入教务处密码\n");scanf("%s",p1->password);
+        printf("请输入手机号码\n");scanf("%s",p1->phone_number);
+        printf("你添加的学生信息为：\n");
+        printf("学号:%s 姓名:%s 性别:%s 班级:%s 教务处密码:%s 手机号码:%s",p1->sc_number,p1->name,p1->gender,p1->class1,p1->password,p1->phone_number);
+        while(1){
+        printf("是否继续录入新的学生？\n(1)yes\t(2)no");
+        char a[5];
+        scanf("%s",a);
+        if(strcmp(a,"yes")==0)
+        {if(head == NULL)head = p1;
+            else rear->next = p1;
+        rear = p1;
+        p1 = (struct student*)malloc(sizeof(struct student));
+        count++;
+        printf("请输入学号\n");scanf("%s",p1->sc_number);
+        printf("请输入姓名\n");scanf("%s",p1->name);
+        printf("请输入性别\n");scanf("%s",p1->gender);
+        printf("请输入班级\n");scanf("%s",p1->class1);
+        printf("请输入教务处密码\n");scanf("%s",p1->password);
+        printf("请输入手机号码\n");scanf("%s",p1->phone_number);
+        printf("你添加的学生信息为：\n");
+        printf("学号:%s 姓名:%s 性别:%s 班级:%s 教务处密码:%s 手机号码:%s",p1->sc_number,p1->name,p1->gender,p1->class1,p1->password,p1->phone_number);
+        }
+        else break;
+        }
+        rear->next = NULL;
+        return (head);
+	}
+*/
+
+void return_main(){         //返回主菜单
+    star();
+    printf("是否返回主菜单\n");
+    printf("(1)是\t(2)否\n");
+    int flag = 0;
+    scanf("%d",&flag);
+    if(flag == 1){system("cls");total_interface();}
+    system("cls");
+    exit_system(f_head);
+
+}
+void print(struct student *head){             //输出链表
+    struct student *p;
+    p = head;
+    printf("当前已录入的学生信息有:\n");
+    while(p!=NULL){
+        printf("学号:%s ",p->sc_number);
+        printf("姓名:%s ",p-> name);
+        printf("性别:%s ", p->gender);
+        printf("班级:%s ",p-> class1);
+        printf("课程名称:%s ",p->lesson_name);
+        printf("任课老师:%s ",p->tea_name);
+        printf("请假次数:%d ",p->qingjia_num);
+        printf("旷课次数:%d ",p->kuangke_num);
+        printf("早退次数:%d ",p->zaotui_num);
+        printf("迟到次数:%d ",p->chidao_num);
+        printf("出勤次数:%d \n",p->attendance);
+        p = p->next;
+    }
+    printf("\n");
+}
+
+void print_lesson(struct student *head){           //查看某课程的考勤记录
+    struct student* p;
+    int i = 0;
+    p = head;
+    char _lesson_name[20];
+    printf("请输入你要查询的课程:\n");
+    scanf("%s",_lesson_name);
+    printf("%s的考勤记录为:\n",_lesson_name);
+    while(p!=NULL){
+        if(strcmp(p -> lesson_name,_lesson_name) == 0){
+        printf("学号:%s ",p->sc_number);
+        printf("姓名:%s ",p-> name);
+        printf("性别:%s ", p->gender);
+        printf("班级:%s ",p-> class1);
+        printf("课程名称:%s ",p->lesson_name);
+        printf("任课老师:%s ",p->tea_name);
+        printf("请假次数:%d ",p->qingjia_num);
+        printf("旷课次数:%d ",p->kuangke_num);
+        printf("早退次数:%d ",p->zaotui_num);
+        printf("迟到次数:%d ",p->chidao_num);
+        printf("出勤次数:%d \n",p->attendance);
+                i = 1;
+                }
+        p = p -> next;
+        }
+    if(i == 0)printf("该课程没有考勤记录！！\n");
+}
+
+void  print_class1(struct student *head){         //查看某班级的考勤信息
+    struct student* p;
+    int i = 0;
+    p = head;
+    char _class1[20];
+    printf("请输入你要查询的课程:\n");
+    scanf("%s",_class1);
+    printf("%s的考勤记录为:\n",_class1);
+    while(p!=NULL){
+        if(strcmp(p -> class1,_class1) == 0){
+                printf("学号:%s ",p->sc_number);
+        printf("姓名:%s ",p-> name);
+        printf("性别:%s ", p->gender);
+        printf("班级:%s ",p-> class1);
+        printf("课程名称:%s ",p->lesson_name);
+        printf("任课老师:%s ",p->tea_name);
+        printf("请假次数:%d ",p->qingjia_num);
+        printf("旷课次数:%d ",p->kuangke_num);
+        printf("早退次数:%d ",p->zaotui_num);
+        printf("迟到次数:%d ",p->chidao_num);
+        printf("出勤次数:%d \n",p->attendance);
+                i = 1;
+                }
+        p = p -> next;
+        }
+    if(i == 0)printf("该班级没有考勤记录！！\n");
+}
+
+void print_sc_number(struct student *head){            //查看某学生的考勤信息
+    struct student* p;
+    int i = 0;
+    p = head;
+    char _sc_number[20];
+    printf("请输入你要查询的学生学号:\n");
+    scanf("%s",_sc_number);
+    printf("%s的考勤记录为:\n",_sc_number);
+    while(p!=NULL){
+        if(strcmp(p -> sc_number,_sc_number) == 0){
+                printf("学号:%s ",p->sc_number);
+        printf("姓名:%s ",p-> name);
+        printf("性别:%s ", p->gender);
+        printf("班级:%s ",p-> class1);
+        printf("课程名称:%s ",p->lesson_name);
+        printf("任课老师:%s ",p->tea_name);
+        printf("请假次数:%d ",p->qingjia_num);
+        printf("旷课次数:%d ",p->kuangke_num);
+        printf("早退次数:%d ",p->zaotui_num);
+        printf("迟到次数:%d ",p->chidao_num);
+        printf("出勤次数:%d \n",p->attendance);
+                i = 1;
+                }
+        p = p -> next;
+        }
+    if(i == 0)printf("该学生没有考勤记录！！\n");
+}
+
+void print_tea_name(struct student *head){            //显示某老师全部课程信息
+    struct student* p;
+    int i = 0;
+    p = head;
+    char _tea_name[20];
+    printf("请输入你要查询的老师名称:\n");
+    scanf("%s",_tea_name);
+    printf("%s的所有课程考勤记录为:\n",_tea_name);
+    while(p!=NULL){
+        if(strcmp(p -> tea_name,_tea_name) == 0){
+        printf("学号:%s ",p->sc_number);
+        printf("姓名:%s ",p-> name);
+        printf("性别:%s ", p->gender);
+        printf("班级:%s ",p-> class1);
+        printf("课程名称:%s ",p->lesson_name);
+        printf("任课老师:%s ",p->tea_name);
+        printf("请假次数:%d ",p->qingjia_num);
+        printf("旷课次数:%d ",p->kuangke_num);
+        printf("早退次数:%d ",p->zaotui_num);
+        printf("迟到次数:%d ",p->chidao_num);
+        printf("出勤次数:%d \n",p->attendance);
+                i = 1;
+                }
+        p = p -> next;
+        }
+    if(i == 0)printf("该老师没有考勤记录！！\n");
+}
+
+void print_tea_lesson(struct student *head){           //显示某老师某课程的出勤信息
+        char  _tea_name[20],_lesson_name[20];
+    printf("请输入你想要查找的老师名字:\n");
+    scanf("%s",_tea_name);
+    printf("请输入相应的课程名称:\n");
+    scanf("%s",_lesson_name);
+    struct student* p;
+    int i = 0;
+    p = head;
+    while(p!=NULL){
+        if(strcmp(p ->tea_name,_tea_name) == 0&&strcmp(p -> lesson_name,_lesson_name) == 0){
+            printf("学号:%s ",p->sc_number);
+        printf("姓名:%s ",p-> name);
+        printf("性别:%s ", p->gender);
+        printf("班级:%s ",p-> class1);
+        printf("课程名称:%s ",p->lesson_name);
+        printf("任课老师:%s ",p->tea_name);
+        printf("请假次数:%d ",p->qingjia_num);
+        printf("旷课次数:%d ",p->kuangke_num);
+        printf("早退次数:%d ",p->zaotui_num);
+        printf("迟到次数:%d ",p->chidao_num);
+        printf("出勤次数:%d \n",p->attendance);
+            i = 1;
+                //return p;
+                }
+        //else{
+            p = p -> next; /*i++;*/
+        //}
+    }
+    if(i == 0)
+    printf("未查找到该条目！\n");
+}
+
+struct student* insert_Node(struct student *head){      //对链表的插入操作,此处形参的head为已有链表的head指针
+    struct student *p1,*q,*s;
+    p1 = head;q = NULL;
+    s = (struct student*)malloc(sizeof(struct student));
+    //count++;
+ //   char _sc_number[10];char _name[10];char _gender[5];char _class1[20];char _password[20];char _phone_number[15];
+    printf("请输入你要新增学生的学号:\n");
+    scanf("%s",s -> sc_number);
+    printf("请输入姓名:\n");
+    scanf("%s",s -> name);
+    printf("请输入性别:\n");
+    scanf("%s",s -> gender);
+    printf("请输入班级:\n");
+    scanf("%s",s -> class1);
+    printf("请输入课程名称:\n");
+    scanf("%s",s -> lesson_name);
+    printf("请输入任课老师:\n");
+    scanf("%s",s -> tea_name);
+    printf("请输入请假次数:\n");
+    scanf("%d",&s->qingjia_num);
+    //printf("请假次数%d",p1->qingjia_num);
+    printf("请输入旷课次数:\n");
+    scanf("%d",&s->kuangke_num);
+    printf("请输入早退次数:\n");
+    scanf("%d",&s->zaotui_num);
+    printf("请输入迟到次数:\n");
+    scanf("%d",&s->chidao_num);
+    printf("请输入出勤次数:\n");
+    scanf("%d",&s->attendance);
+    if (head == NULL){
+        head = s;s ->next = NULL;
+    }
+    else{//printf("我已经进入了");
+        while((p1!=NULL)&&(strcmp(p1->sc_number,s->sc_number)==-1)){
+                //printf("我已经进入了");
+            q = p1;p1 = p1 -> next ;
+        }
+        if(p1==head){
+            s ->next = p1;head = s;
+        }
+        else{
+            s -> next = p1;q ->next = s;
+        }
+    }
+    printf("已成功增添了%s同学的信息\n",s -> sc_number);
+    return (head);
+}
+
+struct student* Del_Node(struct student *head){            //删除学号对应的全部信息
+    char  _sc_number[20];
+    printf("请输入你要删除学生的学号:");
+    scanf("%s",_sc_number);
+    struct student *p,*q;               //p指向q前一个结点
+    int found = 0;
+    p = head; q = NULL;
+    while(p!=NULL){
+        if(strcmp(p->sc_number,_sc_number)==0){
+            found =1;
+            //break;
+        }
+       // else{
+            q = p;
+            p = p -> next;
+        //}
+    }
+    if(found == 1){
+        if(p == head)
+            head = p -> next;
+        else
+            q ->next = p-> next;
+        free(p);
+        printf("学号为%s的学生信息已经删除\n",_sc_number);
+    }
+    else
+        printf("Node not found!\n");
+    return head;
+}
+
+struct student*  find(struct student *head){         //查找已知学号、课程的学生，返回其指针
+    char  _sc_number[20],_lesson_name[20];
+    printf("请输入你想要查找的学生的学号:\n");
+    scanf("%s",_sc_number);
+    printf("请输入相应的课程名称:\n");
+    scanf("%s",_lesson_name);
+    struct student* p;
+    int i = 1;
+    p = head;
+    while(p!=NULL){
+        if(strcmp(p -> sc_number,_sc_number) == 0&&strcmp(p -> lesson_name,_lesson_name) == 0){
+                printf("已找到\n");
+                return p;}
+        else{
+            p = p -> next; i++;
+        }
+    }
+    printf("未查找到该条目！\n");
+    return NULL;
+}
+
+void return_tea(){                 //返回教师菜单
+    star();
+    printf("是否返回教师菜单\n");
+    printf("(1)是\t(2)否\n");
+    int flag = 0;
+    scanf("%d",&flag);
+    if(flag == 1){system("cls");tea_function();}
+    system("cls");
+}
+void modify(struct student* p){          //老师修改，增补学生的信息
+    while(1){
+        int flag = 0; //记录选项
+    char change[20];   //记录修改后的内容
+    int i = 0;
+    printf("请选择你要修改或补充的内容：\n");
+    printf("(1)姓名(2)性别(3)班级(4)课程名称(5)任课老师\n(6)请假次数\n(7)旷课次数(8)早退次数(9)迟到次数(10)出勤次数\n");
+    scanf("%d",&flag);
+    switch(flag){
+case 1:printf("请输入新的姓名\n");
+        scanf("%s",change);
+        strcpy(p->name,change);
+        printf("姓名已经更改为%s\n",change);
+        break;
+case 2:printf("请输入男或女\n");
+        scanf("%s",change);
+        strcpy(p->gender,change);
+        printf("性别已经更改为%s\n",change);
+        break;
+case 3:printf("请输入新的班级\n");
+        scanf("%s",change);
+        strcpy(p->class1,change);
+        printf("班级已经更改为%s\n",change);
+        break;
+case 4:printf("请输入新的课程名称\n");
+        scanf("%s",change);
+        strcpy(p->lesson_name,change);
+        printf("密码已经更改为%s\n",change);
+        break;
+case 5:printf("请输入新的任课老师\n");
+        scanf("%s",change);
+        strcpy(p->tea_name,change);
+        printf("任课老师已经更改为%s\n",change);
+        break;
+case 6:printf("请输入新的请假次数\n");
+        scanf("%d",&i);
+        p->qingjia_num = i;
+        printf("请假次数已经更改为%d\n",p->qingjia_num);
+        break;
+case 7:printf("请输入新的旷课次数\n");
+        scanf("%d",&i);
+        p->kuangke_num = i;
+        printf("旷课次数已经更改为%d\n",p->kuangke_num);
+        break;
+case 8:printf("请输入新的早退次数\n");
+        scanf("%d",&i);
+        p->zaotui_num = i;
+        printf("早退次数已经更改为%d\n",p->zaotui_num);
+        break;
+case 9:printf("请输入新的迟到次数\n");
+        scanf("%d",&i);
+        p->chidao_num = i;
+        printf("迟到次数已经更改为%d\n",p->chidao_num);
+        break;
+case 10:printf("请输入新的出勤次数\n");
+        scanf("%d",&i);
+        p->attendance = i;
+        printf("出勤次数已经更改为%d\n",p->attendance);
+        break;
+    }
+    printf("是否还需要修改其他项?\n");
+    printf("(1)是\t(2)否");
+    flag = 0;
+    scanf("%d",&flag);
+    if(flag == 2){
+            break;
+    exit_system(f_head);
+    }
+
+}
+}
+
+void tea_function(){
+    while(1){
+    int flag = 0;
+    struct student* p1;
+    printf("请选择你要进行的操作：\n(1)修改学生信息\t\t        (2)对学生进行考勤评测\n(3)插入新的学生信息\t\t(4)删除学生信息\n(5)显示全部考勤信息\t\t(6)显示某学科的考勤信息\n");
+    printf("(7)显示某班的考勤信息\t\t(8)显示某同学的考勤信息\n(9)返回主菜单\t\t\t(10)退出系统\n(11)显示某教师全部课程出勤情况\t(12)显示某教师某一课程出勤情况\n");
+    star();
+	scanf("%d",&flag);
+	switch(flag){
+case 1:p1 = find(f_head);
+       modify(p1);
+       return_tea();
+       return_main();
+       break;
+case 2:attendance_evaluation();
+        return_tea();
+        return_main();
+        break;
+case 3:f_head = insert_Node(f_head);
+        return_tea();
+        return_main();
+        break;
+case 4:f_head = Del_Node(f_head);
+        return_tea();
+        return_main();
+        break;
+case 5:print(f_head);
+        return_tea();
+        return_main();
+        break;
+case 6:print_lesson(f_head);
+       return_tea();
+        return_main();
+        break;
+case 7:print_class1(f_head);
+       return_tea();
+        return_main();
+        break;
+case 8:print_sc_number(f_head);
+       return_tea();
+        return_main();
+        break;
+case 9:return_main();
+case 10:exit_system(f_head);
+case 11: print_tea_name(f_head);
+        return_tea();
+        return_main();
+        break;
+case 12:print_tea_lesson(f_head);
+        return_tea();
+        return_main();
+        break;
+
+//case 2:
+}
+
+	}
+}
+int main()
+{
+
+
+ /*struct student* p1;
+     p1 = (struct student*)malloc(sizeof(struct student));               //从文件读入第一个学生的信息
+        //memset(&p1, 0, sizeof(p1));      //将结构体内变量都置为1
+     FILE * fp;
+	fp = fopen("D:\\C实验\\C短学期实验\\学生.txt", "r");
+	if(fp == NULL) printf("can not open the file");
+	fscanf(fp, "%s", p1->sc_number);
+	fscanf(fp, "%s",p1->name);
+	fscanf(fp, "%s",p1->gender);
+    fscanf(fp, "%s",p1->class1);
+	fscanf(fp, "%s ",p1->password);
+	fscanf(fp, "%s",p1->phone_number);
+	printf("读入的信息为:\n学号:%s 姓名:%s 性别:%s 班级:%s 密码:%s 手机号码:%s",p1->sc_number,p1->name,p1->gender,p1 ->class1, p1->password, p1->phone_number);
+
+
+
+    f_head = read_file1();        //测试read_file1()从文件中录入所有学生的信息到内存中
+    print(f_head);
+
+    f_head = insert_Node(f_head);         //测试inser_Node()插入结点
+    print(f_head);
+
+
+    f_head = Del_Node(f_head);        //测试Del_Node()删除结点
+    print(f_head);*/
+    f_head = read_file1();
+    total_interface();
+    return 0;
+}
